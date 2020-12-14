@@ -6,6 +6,19 @@ const app = express();
 
 const StreamZip = require('node-stream-zip');
 
+const redis = require("redis");
+
+const redisCertificateBase64 = process.env.redis_certificate_base64;
+const redisUrl = process.env.redis_url;
+
+const ca = Buffer.from(redisCertificateBase64, 'base64').toString('utf-8');
+
+const clientRedis = redis.createClient(redisUrl, {tls: { ca } });
+
+clientRedis.on('connect', () => console.info(`[redis][createClient]: Connected to Redis ${new Date()}`));
+ 
+clientRedis.on("error", (error) => console.error(`[redis][createClient]: ${error}`));
+
 const multer  = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
@@ -26,6 +39,18 @@ app.post('/unzip', upload.single('file'), (req, res) => {
     }
     res.json(response);
   });
+});
+
+app.get('/redis', (req, res) => {
+  client.get("content", function(err, reply) {
+    return res.send(reply.toString());
+  });
+});
+
+
+app.post('/redis', (req, res) => {
+  client.set("content", req.body.content);
+  return res.send('OK');
 });
 
 app.listen(port);
