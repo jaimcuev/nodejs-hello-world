@@ -42,14 +42,14 @@ app.post('/unzip', upload.single('file'), (req, res) => {
 });
 
 app.get('/redis', (req, res) => {
-  client.get("content", function(err, reply) {
+  clientRedis.get("content", function(err, reply) {
     return res.send(reply.toString());
   });
 });
 
 
 app.post('/redis', (req, res) => {
-  client.set("content", req.body.content);
+  clientRedis.set("content", req.body.content);
   return res.send('OK');
 });
 
