@@ -4,6 +4,9 @@ const port = process.env.PORT || 8080;
 
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const StreamZip = require('node-stream-zip');
 
 const redis = require("redis");
